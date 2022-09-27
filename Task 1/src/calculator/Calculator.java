@@ -1,6 +1,8 @@
 package calculator;
 
 import stack.Stack;
+import token.Token;
+import token.TokenType;
 
 public class Calculator {
 
@@ -10,28 +12,33 @@ public class Calculator {
         values = new Stack<>();
     }
 
-    public void saveValue(Double value) {
-        values.push(value);
+    public void saveValue(Token token) throws RuntimeException {
+        if (token.type == TokenType.NUM) {
+            values.push(Double.valueOf(token.lexeme));
+        } else {
+            throw new RuntimeException("Error: Unexpected character");
+        }
     }
 
-    public Double calculate(Character operator) {
+    public Double calculate(Token token) throws RuntimeException {
 
         Double fistValue = values.pop();
         Double secondValue = values.pop();
         Double result = 0.0;
 
-        switch (operator) {
-            case '*':
-                result = secondValue * fistValue;
+        switch (token.type) {
+            case MINUS:
+                result = secondValue - fistValue;
+                
                 break;
-            case '/':
+            case PLUS:
+                result =  secondValue + fistValue;
+                break;
+            case SLASH:
                 result = secondValue / fistValue;
                 break;
-            case '-':
-                result = secondValue - fistValue;
-                break;
-            case '+':
-                result =  secondValue + fistValue;
+            case STAR:
+                result = secondValue * fistValue;
                 break;            
         }
 

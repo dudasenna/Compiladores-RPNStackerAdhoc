@@ -1,6 +1,7 @@
 package stack;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 public class Stack<E> {
 
@@ -14,7 +15,7 @@ public class Stack<E> {
         linkedList.addFirst(number);
     }
 
-    public E pop() {
+    public E pop() throws NoSuchElementException {
         return (E) linkedList.removeFirst();
     }
 }
