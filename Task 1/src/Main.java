@@ -1,5 +1,6 @@
 import calculator.Calculator;
 import CheckNumber.CheckNumber;
+import Regex.Regex;
 import token.Token;
 import token.TokenType;
 import java.io.File;
@@ -7,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
@@ -20,20 +20,7 @@ public class Main {
             String current = scan.nextLine().trim();
             Token token;
 
-            if (current.equals("-")) {
-                token = new Token(TokenType.MINUS, current);
-            } else if (current.equals("+")) {
-                token = new Token(TokenType.PLUS, current);
-            } else if (current.equals("/")) {
-                token = new Token(TokenType.SLASH, current);
-            } else if (current.equals("*")) {
-                token = new Token(TokenType.STAR, current);
-            } else if (CheckNumber.isNumber(current)) {
-                token = new Token(TokenType.NUM, current);
-            } else {
-                scan.close();
-                throw new RuntimeException("Error: Unexpected character: " + current);
-            }
+            token = getToken(current);
             tokens.add(token);
         }
 
@@ -63,6 +50,18 @@ public class Main {
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private static Token getToken(String token) {
+        Token ret = null;
+        if(Regex.isNum(token)) {
+            ret = new Token(TokenType.NUM, token);
+        } else if (Regex.isOP(token)) {
+            ret = new Token(Regex.getOPTokenType(token), token);
+        } else {
+            throw new RuntimeException("Unexpected character: "+ token);
+        }
+        return ret;
     }
 }
 
