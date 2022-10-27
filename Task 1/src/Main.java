@@ -1,15 +1,34 @@
 import calculator.Calculator;
-import CheckNumber.CheckNumber;
-import Regex.Regex;
-import token.Token;
-import token.TokenType;
+import lexer.LexError;
+import lexer.Regex;
+import lexer.Token;
+import lexer.TokenType;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+
+import expressions.Expressions;
+import Interpreter.Interpreter;
+import Interpreter.InterpreterError;
+import lexer.LexError;
+import lexer.Token;
+import parser.Parser;
+import parser.ParserError;
+
 public class Main {
+
+    private static final Interpreter interpreter = new Interpreter(new HashMap<>());
+    private static boolean hasError = false;
     public static void main(String[] args) throws FileNotFoundException {
         File file = new File("/Users/eduardasenna/Documents/CIn/2022/2022.1/Compiladores/Task 1/src/Input.txt");
 
@@ -44,24 +63,46 @@ public class Main {
                 }
             }
             result = calculator.getResult();
-            System.out.println("Resultado: " + result + "\n");
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found.");
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+
+            Parser parser = new Parser(tokens);
+            Expressions expressions = parser.parse();
+
+            interpreter.env.put("y", "10");
+            interpreter.env.put("x", "3");
+
+            System.out.println(interpreter.interp(expressions));
+            
+        } catch (LexError e) {
+            error("Lex", e.getMessage());
+            hasError = true;
+        }
+        catch (ParserError e) {
+            error("Parser", e.getMessage());
+            hasError = true;
+        }
+        catch (InterpreterError e) {
+            error("Interpreter", e.getMessage());
+            hasError = true;
         }
     }
 
     private static Token getToken(String token) {
         Token ret = null;
-        if(Regex.isNum(token)) {
+        if (Regex.isNum(token)) {
             ret = new Token(TokenType.NUM, token);
-        } else if (Regex.isOP(token)) {
+        } else if (Regex.isID(token)) {
+            ret = new Token(TokenType.ID, token);
+        } else if(Regex.isOP(token)) {
             ret = new Token(Regex.getOPTokenType(token), token);
         } else {
-            throw new RuntimeException("Unexpected character: "+ token);
+            throw new LexError("Unexpected character: "+token);
         }
         return ret;
+    }
+
+    private static void error(String typeError, String message) {
+        System.err.println("[" + typeError + "] Error: " + message);
+        hasError = true;
     }
 }
 

@@ -1,8 +1,8 @@
 package calculator;
 
+import lexer.Token;
+import lexer.TokenType;
 import stack.Stack;
-import token.Token;
-import token.TokenType;
 
 public class Calculator {
 
@@ -29,7 +29,6 @@ public class Calculator {
         switch (token.type) {
             case MINUS:
                 result = secondValue - fistValue;
-                
                 break;
             case PLUS:
                 result =  secondValue + fistValue;
@@ -39,7 +38,9 @@ public class Calculator {
                 break;
             case STAR:
                 result = secondValue * fistValue;
-                break;            
+                break;
+            default:
+                throw new RuntimeException("Operador Inválido");           
         }
 
         values.push(result);
